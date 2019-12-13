@@ -1,0 +1,229 @@
+swagger: "2.0"
+
+################################################################################
+#                              API Information                                 #
+################################################################################
+
+info:
+  description: |
+  
+    "Minesweeper API for Deviget Technical Interview"
+    
+     Design and implement a documented RESTful API for the game (think of a 
+     mobile app for your API)
+     
+  version: "1.0.0"
+  title: "Swagger Minesweeper API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "waldir.pires@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "minesweeper.swagger.io"
+basePath: "/v1"
+
+################################################################################
+#                                           Tags                               #
+################################################################################
+
+tags:
+- name: "game"
+  description: "Operations about game session"
+schemes:
+- "https"
+- "http"
+
+################################################################################
+#                                           Paths                              #
+################################################################################
+
+paths:
+  /games:
+    post:
+      tags:
+      - "game"
+      summary: "Create a new game session"
+      description: ""
+      operationId: "startNewGameSession"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Game session configuration to be created"
+        required: true
+        schema:
+          $ref: "#/definitions/GameSessionConfigRequest"
+      responses:
+        201:
+          description: "Game started successfully"
+          schema:
+            $ref: "#/definitions/GameSessionConfigResponse"
+
+  /games/{session_id}:
+    get:
+      tags:
+      - "game"
+      summary: "Retrieve an existing game session"
+      description: ""
+      operationId: "getGameSession"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        type: string
+      responses:
+        201:
+          description: "Game retrieved successfully"
+          schema:
+            $ref: "#/definitions/GameSessionConfigResponse"
+        404: 
+          description: "Game session not found"
+
+  /games/{session_id}/update:
+    post:
+      tags:
+      - "game"
+      summary: "updates the game board with user click"
+      description: ""
+      operationId: "update"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        type: string
+      - in: "body"
+        name: "body"
+        description: "Game session updated"
+        required: true
+        schema:
+          $ref: "#/definitions/GameSessionUpdateRequest"
+      responses:
+        201:
+          description: "Game started successfully"
+          schema:
+            $ref: "#/definitions/GameSessionConfigResponse"
+      
+################################################################################
+#                                     Definitions                              #
+################################################################################
+definitions:
+            
+  GameSessionConfigRequest:
+    type: "object"
+    properties:
+      size:
+        type: "integer"
+        format: "int32"
+        example: 8
+        description: |
+          This attribute provides the size of the board.
+          
+          Examples:
+          
+          - ( 8) Easy: 8x8
+          - (16) Medium: 16x16
+          - (24) Difficult: 24x24
+      num_of_mines:
+        type: "integer"
+        format: "int32"
+        description: |
+          This attribute provides the number of mines on the board.
+        example: 10
+        
+  GameStatus:
+    type: string
+    enum:
+    - started
+    - in_progress
+    - over
+
+  GameSessionConfigResponse:
+    type: "object"
+    properties:
+      board:
+        type: "array"
+        items:
+          $ref: "#/definitions/GameBoardData"
+        
+  GameBoardData:
+    type: "object"
+    properties:
+      session_id: 
+        type: "string"
+        description: |
+          The game session ID.
+      status:
+        $ref: "#/definitions/GameStatus"
+      created:
+        type: string
+        format: date-time
+        description: |
+          The game session created datetime
+        example: 2012-05-04T19:42:32.987Z
+      modified:
+        type: string
+        format: date-time
+        description: |
+          The game session last modified datetime
+        example: 2012-05-04T19:42:32.987Z
+      board:
+        $ref: "#/definitions/GameBoard"
+      score:
+        type: "integer"
+        format: "int32"
+        example: 8
+
+  GameBoard:
+    type: "object"
+    properties:
+      items:
+        type: array
+        items:
+          type: array
+          example: ["", "", "", "", "", "", "", ""]
+          items:
+            type: "string"
+      num_rows:
+        type: "integer"
+        format: "int32"
+        example: 8
+      num_cols:
+        type: "integer"
+        format: "int32"
+        example: 8
+      number_of_mines:
+        type: "integer"
+        format: "int32"
+        example: 8
+        description: |
+          This attribute provides the number of mines that exist in the current 
+          board.
+
+  GameSessionUpdateRequest:
+    type: "object"
+    properties:
+      row:
+        type: "integer"
+        format: "int32"
+        example: 8
+      col:
+        type: "integer"
+        format: "int32"
+        example: 8
+      flag:
+        type: string
+        description: |
+          Ability to 'flag' a cell with a question mark or red flag
+
